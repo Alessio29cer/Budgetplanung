@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Budgetplan schnell und einfach</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(135deg, #a80101, #d60000);
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #000000;
+      margin-bottom: 10px;
+    }
+    .container {
+      max-width: 700px;
+      margin: 20px auto;
+      background: rgb(248, 237, 237);
+      padding: 20px 30px;
+      border-radius: 16px;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+    }
+    h2 {
+      margin-top: 20px;
+      color: #000000;
+      border-bottom: 2px solid #ffffff;
+      padding-bottom: 5px;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 12px;
+      background: #15a802;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #44d600;
+    }
+    #result {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+    canvas {
+      margin-top: 20px;
+      width: 100% !important;
+      height: 300px !important;
+    }
+  </style>
+</head>
+<body>
+  <h1>Budgetplan</h1>
+  <div class="container">
+    <h2>Einnahmen</h2>
+    <label for="income">Monatliches Einkommen:</label>
+    <input type="number" id="income" placeholder="z. B. 2300">
+
+    <h2>Ausgaben</h2>
+    <label for="rent">Miete:</label>
+    <input type="number" id="rent" placeholder="z. B. 800">
+
+    <label for="food">Lebensmittel:</label>
+    <input type="number" id="food" placeholder="z. B. 400">
+
+    <label for="transport">Transport (Auto/ÖV):</label>
+    <input type="number" id="transport" placeholder="z. B. 150">
+
+    <label for="fun">Freizeit / Shopping:</label>
+    <input type="number" id="fun" placeholder="z. B. 200">
+
+    <label for="other">Sonstige Ausgaben:</label>
+    <input type="number" id="other" placeholder="z. B. 100">
+
+    <button onclick="calculateBudget()">Budget berechnen</button>
+
+    <div id="result"></div>
+    <canvas id="expensesChart"></canvas>
+  </div>
+
+  <script>
+    let chart; // globale Variable für Diagramm
+
+    function calculateBudget() {
+      let income = parseFloat(document.getElementById("income").value) || 0;
+      let rent = parseFloat(document.getElementById("rent").value) || 0;
+      let food = parseFloat(document.getElementById("food").value) || 0;
+      let transport = parseFloat(document.getElementById("transport").value) || 0;
+      let fun = parseFloat(document.getElementById("fun").value) || 0;
+      let other = parseFloat(document.getElementById("other").value) || 0;
+
+      let expenses = rent + food + transport + fun + other;
+      let rest = income - expenses;
+      let resultBox = document.getElementById("result");
+
+      if (rest > 0) {
+        resultBox.style.background = "#d4edda";
+        resultBox.style.color = "#155724";
+        resultBox.innerHTML = `✅ Super! Du hast ${rest} CHF übrig.<br>
+        Gesamtausgaben: ${expenses} CHF`;
+      } else if (rest === 0) {
+        resultBox.style.background = "#fff3cd";
+        resultBox.style.color = "#856404";
+        resultBox.innerHTML = `⚠️ Dein Budget ist ausgeglichen.<br>
+        Gesamtausgaben: ${expenses} CHF`;
+      } else {
+        resultBox.style.background = "#f8d7da";
+        resultBox.style.color = "#721c24";
+        resultBox.innerHTML = `❌ Achtung! Du gibst ${Math.abs(rest)} CHF zu viel aus.<br>
+        Gesamtausgaben: ${expenses} CHF`;
+      }
+
+      // Diagramm-Daten
+      let labels = ["Miete", "Lebensmittel", "Transport", "Freizeit", "Sonstiges"];
+      let data = [rent, food, transport, fun, other];
+
+      // Falls schon ein Diagramm existiert → löschen
+      if (chart) {
+        chart.destroy();
+      }
+
+      // Neues Diagramm erstellen
+      let ctx = document.getElementById("expensesChart").getContext("2d");
+      chart = new Chart(ctx, {
+        type: "pie",
+        data: {
+          labels: labels,
+          datasets: [{
+            data: data,
+            backgroundColor: [
+              "#42a5f5",
+              "#66bb6a",
+              "#ffa726",
+              "#ab47bc",
+              "#ef5350"
+            ]
+          }]
+        },
+        options: {
+          plugins: {
+            legend: {
+              position: "bottom"
+            }
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>
